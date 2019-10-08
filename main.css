@@ -622,8 +622,9 @@ td {
 }
 
 #maze {
-    margin: 50px auto;
+    margin: 20px auto;
     display: block;
+    width: 800px;
 }
 body.index {
     text-align: center;

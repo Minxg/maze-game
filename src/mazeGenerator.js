@@ -11,12 +11,12 @@ var MazeGenerator = function(rows, cols) {
     	var randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
     	self.cellStack.push(cell);
     	self.graph.removeEdgeBetween(cell, randomNeighbor);
-    	recurse(randomNeighbor);
+    	return recurse(randomNeighbor);
     }
     else {
     	var waitingCell = self.cellStack.pop();
     	if(waitingCell) {
-    		recurse(waitingCell);
+    		return recurse(waitingCell);
     	}
     }
   };

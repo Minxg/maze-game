@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>TOC test</title>
+</head>
+<body>
+  <input id="input" type="number" placeholder="input values">
+  <button id="notoc">no toc</button>
+  <button id="toc">toc</button>
+<script>
+function Fibonacci(n) {
+  if (n <= 1) { return 1 };
+
+  return Fibonacci(n - 1) + Fibonacci(n - 2);
+}
+function Fibonacci2(n, ac1 = 1, ac2 = 1) {
+  if (n <= 1) { return ac2 };
+
+  return Fibonacci2(n - 1, ac2, ac1 + ac2);
+}
+
+var btn = document.querySelector('#notoc')
+btn.addEventListener('click', calcFibonacci, false)
+
+var btn2 = document.querySelector('#toc')
+btn2.addEventListener('click', calcFibonacci2, false)
+
+function calcFibonacci() {
+  var val = document.querySelector('#input').value
+  console.log('to calc: ', val)
+  var result = Fibonacci(val)
+  console.log(`fibo(${val}) = ${result}`)
+}
+
+function calcFibonacci2() {
+  var val = document.querySelector('#input').value
+  console.log('to calc: ', val)
+  var result = Fibonacci2(val)
+  console.log(`fibo(${val}) = ${result}`)
+}
+console.log(Fibonacci(5))
+</script>
+</body>
+</html>

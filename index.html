@@ -35,20 +35,33 @@
     <script src="src/graph.js"></script>
     <script src="src/maze.js"></script>
     <script>
+        'use strict';
         var maze = new Maze(document, 'maze');
         var waitElem = $("#pleasewait");
         
         setTimeout(function() {
+            window.startTime = Date.now()
             maze.generate();
+            console.log('maze generated in millseconds: ', Date.now() - window.startTime)
             maze.draw();
             waitElem.remove();
             $("#solve").show();
         }, 1000);
-
+        
         $(function() {
             $('#solve').click(function() {
                 maze.solve();
             });
+
+            // computeMaxCallStackSize
+            function c() {
+                try {
+                    return 1 + c();
+                } catch(e) {
+                    return 1
+                }
+            }
+            console.log('computeMaxCallStackSize: ', c())
         });
     </script>
 </body>

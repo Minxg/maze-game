@@ -1,10 +1,30 @@
+// 'use strict';
+
+function tco(f) {
+  var value;
+  var active = false;
+  var accumulated = [];
+
+  return function accumulator() {
+    accumulated.push(arguments);
+    if (!active) {
+      active = true;
+      while (accumulated.length) {
+        value = f.apply(this, accumulated.shift());
+      }
+      active = false;
+      return value;
+    }
+  };
+}
+
 var MazeGenerator = function(rows, cols) {
 	this.graph = new Graph(rows, cols);
 	this.cellStack = [];
 
 	var self = this;
 
-	var recurse = function(cell) {
+	var recurse = tco(function(cell) {
 		cell.visit();
     var neighbors = self.graph.cellUnvisitedNeighbors(cell);
     if(neighbors.length > 0) {
@@ -19,7 +39,7 @@ var MazeGenerator = function(rows, cols) {
     		return recurse(waitingCell);
     	}
     }
-  };
+  });
 
   this.solve = function() {
     var closedSet = [];

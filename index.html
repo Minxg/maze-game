@@ -35,7 +35,7 @@
     <script src="src/graph.js"></script>
     <script src="src/maze.js"></script>
     <script>
-        'use strict';
+        // 'use strict';
         var maze = new Maze(document, 'maze');
         var waitElem = $("#pleasewait");
         
@@ -44,6 +44,7 @@
             maze.generate();
             console.log('maze generated in millseconds: ', Date.now() - window.startTime)
             maze.draw();
+            console.log('maze draw in millseconds: ', Date.now() - window.startTime)
             waitElem.remove();
             $("#solve").show();
         }, 1000);

@@ -37,15 +37,15 @@
     <script>
         // 'use strict';
         var maze = new Maze(document, 'maze');
-        var waitElem = $("#pleasewait");
+        // var waitElem = $("#pleasewait");
         
         setTimeout(function() {
             window.startTime = Date.now()
             maze.generate();
             console.log('maze generated in millseconds: ', Date.now() - window.startTime)
-            maze.draw();
+            // maze.draw();
             console.log('maze draw in millseconds: ', Date.now() - window.startTime)
-            waitElem.remove();
+            // waitElem.hide();
             $("#solve").show();
         }, 1000);
         

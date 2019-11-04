@@ -8,12 +8,13 @@ var Maze = function(doc, elemId) {
   this.generator = new MazeGenerator(this.horizCells, this.vertCells);
   this.cellWidth = this.width / this.horizCells;
   this.cellHeight = this.height / this.vertCells;
-  
+
   var self = this;
   var lineWidth = 1
   self.ctx.strokeStyle = "rgb(0, 0, 0)";
   self.ctx.fillStyle = "rgba(255, 0, 0, 0.1)";
   self.ctx.lineWidth = lineWidth;
+  self.charactor = null;
 
   return {
     width: function() {
@@ -25,9 +26,25 @@ var Maze = function(doc, elemId) {
     },
 
     generate: function () {
+      var waitElem = $('#pleasewait');
+      waitElem.show();
       self.generator.generate();
+      this.drawBorders();
+      this.drawMaze();
+      this.drawCharactor();
+      waitElem.hide();
     },
 
+    nextLevel: function () {
+      self.ctx.clearRect(0, 0, self.width, self.height)
+      self.horizCells += 50;
+      self.vertCells += 50;
+      self.cellWidth = self.width / self.horizCells;
+      self.cellHeight = self.height / self.vertCells;
+      self.generator = new MazeGenerator(self.horizCells, self.vertCells);
+      this.generate()
+    },
+    
     draw: function() {
       this.drawBorders();
       this.drawMaze();
@@ -35,11 +52,117 @@ var Maze = function(doc, elemId) {
     },
 
     drawCharactor: function() {
-      var charactor = new Image();
-      charactor.onload = function() {
-        self.ctx.drawImage(charactor, self.cellWidth * .2, self.cellHeight * .2, self.cellWidth * .6, self.cellHeight * .6);
+      var pos = {
+        x: 0,
+        y: 0,
       }
-      charactor.src = './avatar.png'
+      var drawArgs = function () {
+        return {
+          x: pos.x * self.cellWidth + self.cellWidth * 0.1,
+          y: pos.y * self.cellHeight + self.cellHeight * 0.1,
+          width: self.cellWidth * 0.8,
+          height: self.cellHeight * 0.8
+        };
+      }
+
+      if (!self.charactor) {
+        self.charactor = new Image()
+        self.charactor.onload = drawCharactor;
+        self.charactor.src = './avatar.png'
+        window.addEventListener('keydown', (ev) => {
+          switch (ev.keyCode) {
+            case 37:
+              // console.log('left');
+              if (isMoveLegal(pos.x, pos.y, pos.x - 1, pos.y)) {
+                clearCharactor();
+                pos.x = pos.x - 1;
+                drawCharactor()
+              }
+              break;
+            case 38:
+              // console.log('up');
+              if (isMoveLegal(pos.x, pos.y, pos.x, pos.y - 1)) {
+                clearCharactor();
+                pos.y = pos.y - 1;
+                drawCharactor()
+              }
+              break;
+            case 39:
+              // console.log('right');
+              if (isMoveLegal(pos.x, pos.y, pos.x + 1, pos.y)) {
+                clearCharactor();
+                pos.x = pos.x + 1;
+                drawCharactor()
+              }
+              break;
+            case 40:
+              // console.log('down');
+              if (isMoveLegal(pos.x, pos.y, pos.x, pos.y + 1)) {
+                clearCharactor();
+                pos.y = pos.y + 1;
+                drawCharactor()
+              }
+              break;
+            default:
+              ;
+          }
+        }, false)
+      }
+
+      function drawCharactor() {
+        var args = drawArgs()
+        self.ctx.drawImage(
+          self.charactor,
+          args.x,
+          args.y,
+          args.width,
+          args.height
+        );
+      }
+      function clearCharactor() {
+        var args = drawArgs()
+        self.ctx.clearRect(
+          args.x,
+          args.y,
+          args.width,
+          args.height
+        );
+      }
+
+      const onWin = () => {
+        console.log('You Win!');
+        this.nextLevel()
+        clearCharactor();
+        pos.x = 0
+        pos.y = 0
+        drawCharactor()
+      }
+      function isMoveLegal(x, y, nextX, nextY) {
+        // out of borders detect
+        if (nextX === self.horizCells - 1 && nextY === self.vertCells) {
+          onWin();
+          return false
+        }
+        if (nextX < 0 || nextY < 0 || nextX >= self.horizCells || nextY > self.vertCells) {
+          return false
+        }
+        // collision detect
+        var graph = self.generator.graph;
+        var removedEdges = graph.removedEdges;
+        var canMoveThrough = _.detect(removedEdges, function(edge) {
+          return (
+            (edge[0].x === x &&
+              edge[0].y === y &&
+              edge[1].x === nextX &&
+              edge[1].y === nextY) ||
+            (edge[0].x === nextX &&
+              edge[0].y === nextY &&
+              edge[1].x === x &&
+              edge[1].y === y)
+          );
+        });
+        return !!canMoveThrough
+      }
     },
 
     solve: function() {
@@ -64,7 +187,7 @@ var Maze = function(doc, elemId) {
           var y = cell.y * self.cellHeight;
           setTimeout(function() {
             self.ctx.fillRect(x, y, self.cellWidth, self.cellHeight);
-          }, 80 * i);
+          }, 0.01 * i);
         })();
       }
     },
